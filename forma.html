@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forma | Design + Build</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+        /* --- VARIABLES & RESET --- */
+        :root {
+            --font-main: "Montserrat", sans-serif;
+            --font-serif: "Times New Roman", Times, serif;
+            --color-primary: #d1cfc3;
+            /* Beige */
+            --color-secondary: #1d1919;
+            /* Dark */
+            --transition-speed: 0.6s;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-main);
+            color: var(--color-secondary);
+            background-color: #a0a0a0;
+            overflow-x: hidden;
+            overflow-y: scroll;
+        }
+
+        /* --- LAYOUT LAYERS --- */
+
+        /* 1. Background (Three.js) */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* 2. Scroll Container */
+        #scroll-container {
+            position: relative;
+            z-index: 10;
+        }
+
+        .scroll-target {
+            height: 100vh;
+            width: 100%;
+        }
+
+        /* 3. Fixed UI Overlay (Hero) */
+        #fixed-ui {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 20;
+            padding: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 100%;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        #fixed-ui>* {
+            pointer-events: auto;
+        }
+
+        /* --- FIXED NAVIGATION LINKS --- */
+        .fixed-nav {
+            position: fixed;
+            z-index: 30;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #fff;
+            mix-blend-mode: difference;
+            text-decoration: none;
+            pointer-events: auto;
+            transition: opacity 0.5s ease;
+        }
+
+        .nav-services {
+            top: 40px;
+            right: 40px;
+        }
+
+        .nav-contact {
+            bottom: 40px;
+            left: 40px;
+        }
+
+        /* --- UI COLUMNS --- */
+        .screen-left {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .screen-right {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* --- HERO LOGO --- */
+        .logo-img {
+            width: clamp(200px, 40vw, 600px);
+            height: auto;
+            opacity: 0.9;
+            mix-blend-mode: overlay;
+            filter: contrast(1.2);
+            transition: opacity 0.5s ease;
+        }
+
+        /* --- HERO TEXT & DROPDOWN --- */
+        .hero-wrapper-center {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .hero-content {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            justify-content: flex-end;
+            gap: 60px;
+            padding-right: 4px;
+        }
+
+        .hero-text {
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: var(--color-secondary);
+            letter-spacing: 0.05em;
+            transition: color var(--transition-speed) ease;
+        }
+
+        .dropdown-wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .clickable {
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .clickable:hover {
+            opacity: 0.7;
+        }
+
+        .dropdown-menu {
+            display: none;
+            flex-direction: column;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            margin-top: 10px;
+            gap: 8px;
+            min-width: 120px;
+        }
+
+        .dropdown-menu.active {
+            display: flex;
+        }
+
+        .dropdown-item {
+            font-size: 1rem;
+            color: inherit;
+            text-decoration: none;
+            font-weight: 600;
+            opacity: 0;
+            animation: slideIn 0.3s forwards;
+        }
+
+        .dropdown-item:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- LOWER HALF SECTION (Project) --- */
+        #lower-half {
+            position: relative;
+            z-index: 25;
+            width: 100%;
+            min-height: 100vh;
+            background-color: var(--color-primary);
+            color: var(--color-secondary);
+            padding: 60px 40px 100px 40px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .project-meta-row {
+            display: flex;
+            justify-content: flex-end;
+            align-items: baseline;
+            margin-bottom: 20px;
+            gap: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .project-title-bold {
+            font-weight: 900;
+            font-size: 1.1rem;
+        }
+
+        .large-project-image {
+            width: 100%;
+            height: 85vh;
+            object-fit: cover;
+            border: 1px solid var(--color-secondary);
+            display: block;
+        }
+
+        /* =========================================
+           ABOUT SEQUENCE (Concrete Background)
+           ========================================= */
+
+        #about-sequence {
+            position: relative;
+            z-index: 30;
+            width: 100%;
+            /* BACKGROUND CONFIGURATION */
+            /* Add your concrete texture image here */
+            background-image: url('concrete.jpg');
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: #1a1a1a;
+            overflow: hidden;
+        }
+
+        /* --- STICKY LOGO IN ABOUT SECTION --- */
+        .about-sticky-logo {
+            position: fixed;
+            top: 4%;
+            /* Matches top position in your image */
+            left: 40px;
+            /* Aligned to left padding */
+            width: 15vw;
+            /* Responsive sizing */
+            opacity: 0;
+            /* Hidden by default */
+            pointer-events: none;
+            z-index: 31;
+            transition: opacity 0.5s ease;
+            mix-blend-mode: overlay;
+        }
+
+        .about-sticky-logo img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .show-about-logo {
+            opacity: 0.8;
+        }
+
+        /* Visible state */
+
+        /* --- ABOUT CONTENT LAYOUT --- */
+        .about-sub-section {
+            min-height: 100vh;
+            padding: 60px 40px;
+            display: flex;
+            position: relative;
+            z-index: 32;
+        }
+
+        .about-h2 {
+            font-family: var(--font-main);
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            text-transform: lowercase;
+            color: #1a1a1a;
+        }
+        .about-h2w {
+            font-family: var(--font-main);
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            text-transform: lowercase;
+            color: var(--color-primary);
+        }
+
+        .about-p {
+            font-family: var(--font-main);
+            font-size: 1.1rem;
+            line-height: 1.2; 
+            max-width: 350px;
+            /* Constrained width for readability */
+            color: #333;
+        }
+
+        .about-p2 {
+            font-family: var(--font-main);
+            font-size: 1.1rem;
+            line-height: 1.2;
+            max-width: 350px;
+            color: var(--color-primary);
+        }
+
+        .plus-marker {
+            font-family: monospace;
+            font-size: 1.5rem;
+            position: absolute;
+            right: 15%;
+            top: 50%;
+            opacity: 0.6;
+        }
+
+        /* SECTION 1: Intro */
+        /* --- SECTION 1: Intro Alignment --- */
+        #about-intro {
+            flex-direction: column;
+            justify-content: center;
+            gap: 150px;
+        }
+
+        /* Design Block -> Push to RIGHT */
+        .design-align {
+            align-self: flex-end;
+            text-align: right; 
+        }
+
+        /* Build Block -> Push to LEFT */
+        .build-align {
+            margin-top: 10%;
+            align-self: flex-start;
+            text-align: left;
+            margin-left: 50vw;
+
+        }
+
+        /* --- Mobile Reset (Add to your existing @media query) --- */
+        @media (max-width: 768px) {
+
+            .design-align,
+            .build-align {
+                align-self: flex-start;
+                text-align: left;
+                margin-right: 0;
+                margin-left: 0;
+            }
+        }
+
+        .intro-block {
+            margin-right: 5%;
+        }
+
+        /* SECTION 2: Services */
+        #about-services {
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .services-row {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .serv-left {
+            align-self: center; 
+        }
+
+        .serv-right {
+            align-self: flex-end;
+            text-align: right;
+            margin-right: 5%;
+            margin-top: 700px;
+            margin-bottom: 200px;
+        }
+
+        /* SECTION 3: Team (Specific Request) */
+        #about-team {
+            justify-content: space-between;
+            align-items: flex-start;
+            /* Align both to top initially */
+            padding: 0 5%;
+            margin-top: 100px;
+        }
+
+        .team-col {
+            width: 35%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .team-img1 {
+            width: 220px;
+            height: 400px;
+            /* Portrait aspect ratio */
+            object-fit: cover;
+            filter: grayscale(10%);
+        }
+        .team-img2 {
+            width: 220px;
+            height: 400px;
+            margin-top: -120px;
+            /* Portrait aspect ratio */
+            object-fit: cover;
+            filter: grayscale(10%);
+        }
+
+        /* Left Column: Text First, then Image */
+        .team-left {
+            margin-top: 0;
+            /* Starts at top */
+        }
+
+        /* Right Column: Image First, then Text */
+        .team-right {
+            /* Push down slightly for staggered look if needed, or keep aligned top */
+            margin-top: 50px;
+        }
+
+        /* SECTION 4: Contact */
+        #about-contact {
+            align-items: flex-end;
+            padding-bottom: 100px;
+        }
+
+        .contact-container {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .contact-group {
+            margin-bottom: 40px;
+        }
+
+        .contact-right {
+            text-align: right;
+        }
+
+        .contact-link {
+            display: block;
+            color: #1a1a1a;
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        .contact-link2 {
+            display: block;
+            color: var(--color-primary);
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+
+        /* =========================================
+           RESPONSIVE DESIGN (MOBILE / TABLET)
+           ========================================= */
+        @media (max-width: 768px) {
+
+            /* General Padding */
+            #fixed-ui {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+                padding: 40px 20px;
+            }
+
+            #lower-half {
+                padding: 40px 20px;
+            }
+
+            .about-sub-section {
+                padding: 100px 20px 40px 20px;
+            }
+
+            /* Hero Adjustments */
+            .logo-img {
+                width: 60vw;
+            }
+
+            .hero-content {
+                flex-direction: column;
+                align-items: flex-end;
+                gap: 10px;
+                justify-content: flex-start;
+            }
+
+            .nav-services {
+                top: 20px;
+                right: 20px;
+            }
+
+            .nav-contact {
+                bottom: 20px;
+                left: 20px;
+            }
+
+            .dropdown-menu {
+                position: relative;
+                align-items: flex-end;
+                margin-top: 5px;
+            }
+
+            /* Project Adjustments */
+            .large-project-image {
+                height: 50vh;
+            }
+
+            .project-meta-row {
+                flex-direction: column;
+                align-items: flex-end;
+                gap: 5px;
+                text-align: right;
+            }
+
+            /* --- ABOUT SECTION MOBILE --- */
+
+            /* Sticky Logo moves to top-left on mobile */
+            .about-sticky-logo {
+                width: 30vw;
+                top: 2%;
+                left: 20px;
+            }
+
+            /* Intro */
+            #about-intro {
+                gap: 60px;
+                justify-content: flex-start;
+                margin-top: 60px;
+            }
+
+            .intro-block {
+                text-align: left;
+                margin-right: 0;
+                align-self: flex-start;
+            }
+
+            /* Services */
+            .services-row {
+                flex-direction: column;
+                gap: 60px;
+            }
+
+            .serv-left {
+                margin-left: 0;
+                align-self: flex-start;
+            }
+
+            .serv-right {
+                margin-right: 0;
+                align-self: flex-start;
+                text-align: left;
+                margin-bottom: 0;
+            }
+
+            /* Team - Stack vertically */
+            #about-team {
+                flex-direction: column;
+                gap: 80px;
+                margin-top: 40px;
+            }
+
+            .team-col {
+                width: 100%;
+            }
+
+            .team-right {
+                margin-top: 0;
+            }
+
+            .team-img1 {
+                height: 400px;
+            }
+
+            /* Contact */
+            .contact-container {
+                flex-direction: column;
+                gap: 40px;
+            }
+
+            .contact-right {
+                text-align: left;
+            }
+
+            .contact-group {
+                margin-bottom: 20px;
+            }
+
+            .plus-marker {
+                display: none;
+            }
+        }
+        /* --- FIXED FOOTER (Replaces Fixed Nav) --- */
+.fixed-footer {
+    position: fixed;
+    bottom: 40px;
+    left: 0;
+    width: 100%;
+    padding: 0 40px;
+    display: flex;
+    justify-content: space-between; /* Pushes Contact left, Home right */
+    align-items: flex-end;
+    z-index: 30;
+    pointer-events: none;
+    mix-blend-mode: difference; /* Ensures visibility on all backgrounds */
+    color: #fff;
+    transition: opacity 0.5s ease;
+}
+
+.footer-link {
+    font-weight: 700;
+    font-size: 1rem;
+    text-decoration: none;
+    color: inherit;
+    pointer-events: auto;
+    text-transform: lowercase;
+}
+
+/* Centers the 'services' link exactly */
+.footer-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Mobile Adjustment */
+@media (max-width: 768px) {
+    .fixed-footer {
+        bottom: 20px;
+        padding: 0 20px;
+    }
+}
+    </style>
+</head>
+
+<body>
+
+    <div id="canvas-container"></div>
+
+    <a href="#about-services" class="fixed-nav nav-services">services</a>
+    <a href="#about-contact" class="fixed-nav nav-contact">contact</a>
+
+    <div id="fixed-ui">
+        <div class="screen-left">
+            <img src="Logo - Cream - without byline_1@400x.png" alt="forma" class="logo-img">
+        </div>
+        <div class="screen-right">
+            <div class="hero-wrapper-center">
+                <div class="hero-content" id="hero-text-container">
+                    <div class="dropdown-wrapper">
+                        <span class="hero-text clickable" id="text-design" onclick="toggleMenu()">design</span>
+                        <div class="dropdown-menu" id="dropdown-menu">
+                            <a href="/projectList.html" class="dropdown-item">projects</a>
+                            <a href="#" class="dropdown-item">publications</a>
+                        </div>
+                    </div>
+                    <span class="hero-text" id="text-plus">+</span>
+                    <span class="hero-text" id="text-build">build</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="scroll-container">
+        <section class="scroll-target"></section>
+        <section class="scroll-target"></section>
+        <section class="scroll-target"></section>
+        <section class="scroll-target"></section>
+
+        <section id="lower-half">
+            <div class="project-meta-row">
+                <span>2024, Holiday home, Kotagiri, Tamil Nadu</span>
+                <span class="project-title-bold">the aerie</span>
+            </div>
+            <img src="/demo.png" alt="The Aerie" class="large-project-image">
+        </section>
+
+        <section id="about-sequence">
+
+            <div class="about-sticky-logo" id="about-logo">
+                <img src="Logo - Cream - without byline_1@400x.png" alt="forma logo">
+            </div>
+
+            <div class="about-sub-section" id="about-intro">
+
+                <div class="intro-block design-align">
+                    <h2 class="about-h2w">design</h2>
+                    <p class="about-p2">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+                        incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniamincididunt ut labore et
+                        dolore magna aliqua. Ut enim ad minim veniam.</p>
+                </div>
+
+                <div class="intro-block build-align">
+                    <h2 class="about-h2">build</h2>
+                    <p class="about-p">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+                        incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+                        exercitationincididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+                        exercitation.
+                    </p>
+                </div>
+            </div>
+            <div class="about-sub-section" id="about-services">
+                <div class="plus-marker" style="top:70%">+</div>
+                <div class="services-row">
+                    <div class="serv-left">
+                        <h2 class="about-h2w">our services</h2>
+                        <p class="about-p2">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+                            tempor incididunt ut labore et dolore magna aliqua.</p>
+                    </div>
+                    <div class="serv-right">
+                        <h2 class="about-h2">our services</h2>
+                        <p class="about-p">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+                            tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="about-sub-section" id="about-team">
+
+                <div class="team-col team-left">
+                    <div>
+                        <h2 class="about-h2w">ram pai</h2>
+                        <p class="about-p2">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+                            tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.</p>
+                    </div>
+                    <img src="demo.png" class="team-img1" alt="Ram Pai">
+                </div>
+
+                <div class="team-col team-right">
+                    <img src="demo.png" class="team-img2" alt="Suraksha">
+                    <div>
+                        <h2 class="about-h2">suraksha</h2>
+                        <p class="about-p">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+                            tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="about-sub-section" id="about-contact">
+                <div class="contact-container">
+                    <div class="contact-left">
+                        <div class="contact-group">
+                            <h2 class="about-h2w">contact</h2>
+                            <a href="mailto:hello@formadesignbuild.com"
+                                class="contact-link2">hello@formadesignbuild.com</a>
+                        </div>
+                        <div class="contact-group">
+                            <h2 class="about-h2w">instagram</h2>
+                            <a href="#" class="contact-link2">@formadesignbuild</a>
+                        </div>
+                    </div>
+                    <div class="contact-right">
+                        <div class="plus-marker" style="position: relative; right: 0; margin-bottom: 20px;">+</div>
+                        <div class="contact-group">
+                            <h2 class="about-h2">address</h2>
+                            <p class="about-p">forma design + build<br>cooke town<br>bangalore 560 084</p>
+                        </div>
+                        <div class="contact-group">
+                            <h2 class="about-h2">phone</h2>
+                            <p class="about-p">+91 00000 00000</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </div>
+
+    <script>
+        // --- UI INTERACTION ---
+        function toggleMenu() {
+            document.getElementById('dropdown-menu').classList.toggle('active');
+        }
+
+        // --- CONFIGURATION ---
+        const colors = {
+            primary: "#d1cfc3", // Beige
+            secondary: "#1d1919", // Dark
+        };
+
+        // --- THREE.JS BACKGROUND ---
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        const loader = new THREE.TextureLoader();
+        let material;
+
+        const imageUrls = [
+            '/home1.png',
+            '/home2org.png',
+            '/home3.png',
+            '/home1.png'
+        ];
+
+        const loadTexture = (url) => {
+            return new Promise(resolve => {
+                loader.load(url, (tex) => {
+                    tex.minFilter = THREE.LinearFilter;
+                    tex.generateMipmaps = false;
+                    resolve(tex);
+                }, undefined, () => resolve(null));
+            });
+        };
+
+        Promise.all(imageUrls.map(loadTexture)).then(textures => {
+            const validTextures = textures.map(t => t || new THREE.Texture());
+            const geometry = new THREE.PlaneGeometry(2, 2);
+
+            const fragmentShader = `
+                uniform sampler2D uTex0;
+                uniform sampler2D uTex1;
+                uniform sampler2D uTex2;
+                uniform sampler2D uTex3;
+                uniform float uScroll; 
+                uniform float uTime;
+                varying vec2 vUv;
+                float random(vec2 st) {
+                    return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+                }
+                void main() {
+                    vec2 uv = vUv;
+                    vec4 c0 = texture2D(uTex0, uv);
+                    vec4 c1 = texture2D(uTex1, uv);
+                    vec4 c2 = texture2D(uTex2, uv);
+                    vec4 c3 = texture2D(uTex3, uv);
+                    vec4 finalColor;
+                    if (uScroll < 1.0) {
+                        finalColor = mix(c0, c1, smoothstep(0.0, 1.0, uScroll));
+                    } else if (uScroll < 2.0) {
+                        finalColor = mix(c1, c2, smoothstep(1.0, 2.0, uScroll));
+                    } else if (uScroll < 3.0) {
+                        finalColor = mix(c2, c3, smoothstep(2.0, 3.0, uScroll));
+                    } else {
+                        finalColor = c3; 
+                    }
+                    float noise = random(uv + uTime * 0.1);
+                    finalColor.rgb -= noise * 0.05;
+                    gl_FragColor = finalColor;
+                }
+            `;
+
+            const vertexShader = `varying vec2 vUv; void main() { vUv = uv; gl_Position = vec4(position, 1.0); }`;
+
+            material = new THREE.ShaderMaterial({
+                uniforms: {
+                    uTex0: { value: validTextures[0] },
+                    uTex1: { value: validTextures[1] },
+                    uTex2: { value: validTextures[2] },
+                    uTex3: { value: validTextures[3] },
+                    uScroll: { value: 0.0 },
+                    uTime: { value: 0 }
+                },
+                vertexShader: vertexShader,
+                fragmentShader: fragmentShader
+            });
+
+            scene.add(new THREE.Mesh(geometry, material));
+        });
+
+        // --- ANIMATION & LOGIC ---
+        const clock = new THREE.Clock();
+
+        const elDesign = document.getElementById('text-design');
+        const elPlus = document.getElementById('text-plus');
+        const elBuild = document.getElementById('text-build');
+        const fixedUi = document.getElementById('fixed-ui');
+        const fixedNavs = document.querySelectorAll('.fixed-nav');
+
+        // Sticky Logo Element
+        const aboutLogo = document.getElementById('about-logo');
+        const aboutSection = document.getElementById('about-sequence');
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (material) material.uniforms.uTime.value = clock.getElapsedTime();
+
+            const scrollY = window.scrollY || document.documentElement.scrollTop;
+            const winH = window.innerHeight;
+
+            const progress = Math.min(Math.max(scrollY / winH, 0), 3.0);
+            if (material) material.uniforms.uScroll.value = progress;
+
+            // --- FADE LOGIC ---
+            if (scrollY > winH * 3.5) {
+                fixedUi.style.opacity = '0';
+                fixedNavs.forEach(nav => nav.style.opacity = '0');
+            } else {
+                fixedUi.style.opacity = '1';
+                fixedNavs.forEach(nav => nav.style.opacity = '1');
+            }
+
+            // --- STICKY LOGO LOGIC ---
+            if (aboutSection) {
+                const rect = aboutSection.getBoundingClientRect();
+                if (rect.top < winH && rect.bottom > 0) {
+                    aboutLogo.classList.add('show-about-logo');
+                } else {
+                    aboutLogo.classList.remove('show-about-logo');
+                }
+            }
+
+            // --- HERO TEXT COLORS ---
+            const currentIndex = Math.round(progress);
+            if (currentIndex === 0 || currentIndex === 3) {
+                elDesign.style.color = colors.secondary;
+                elPlus.style.color = colors.secondary;
+                elBuild.style.color = colors.primary;
+            } else if (currentIndex === 1) {
+                elDesign.style.color = colors.secondary;
+                elPlus.style.color = colors.secondary;
+                elBuild.style.color = colors.secondary;
+            } else if (currentIndex === 2) {
+                elDesign.style.color = colors.primary;
+                elPlus.style.color = colors.primary;
+                elBuild.style.color = colors.primary;
+            }
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+    </script>
+</body>
+
+</html>

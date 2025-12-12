@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forma | Projects</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- RESET & VARIABLES --- */
+        :root {
+            --font-main: "Montserrat", sans-serif;
+            --color-bg: #d1cfc3;
+            --color-text: #1d1919;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            /* THE KEY: Lock the screen to 100vh (No Scroll) */
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden; 
+            position: relative;
+        }
+
+        a { text-decoration: none; color: inherit; transition: opacity 0.3s; }
+        a:hover { opacity: 0.6; }
+
+        /* --- HEADER (Fixed) --- */
+        header {
+            position: absolute;
+            top: 0; left: 0; width: 100%;
+            padding: 40px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            z-index: 10;
+        }
+
+        .logo-img { width: 140px; height: auto; mix-blend-mode: multiply; }
+        .page-title { font-weight: 700; font-size: 1.1rem; text-transform: lowercase; margin-top: 10px; }
+
+        /* --- MAIN LAYOUT (The 100vh container) --- */
+        main {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        /* Common Project Styles */
+        .project-card {
+            position: absolute; /* Allows exact placement */
+            display: flex;
+            align-items: flex-start;
+            gap: 30px;
+            width: 45vw; /* Keeps them proportionate to screen width */
+            max-width: 700px;
+        }
+
+        .project-img-box {
+            width: 60%;
+            aspect-ratio: 16/11; /* Maintains the rectangle shape */
+            overflow: hidden;
+        }
+
+        .project-img {
+            width: 100%; height: 100%; object-fit: cover;
+            display: block;
+            transition: transform 0.8s ease;
+        }
+        
+        .project-card:hover .project-img { transform: scale(1.03); }
+
+        .project-info {
+            width: 40%;
+            padding-top: 5px;
+        }
+
+        .p-title {
+            font-weight: 800;
+            font-size: 1.4rem;
+            margin-bottom: 12px;
+            text-transform: lowercase;
+        }
+
+        .p-meta {
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: #333;
+            font-weight: 500;
+        }
+
+        /* --- POSITIONING THE TWO PROJECTS --- */
+
+        /* Project 1: Top Left area */
+        #project-1 {
+            top: 20%;      /* Push down from header */
+            left: 5%;      /* Push in from left */
+        }
+
+        /* Project 2: Bottom Right area */
+        #project-2 {
+            bottom: 15%;   /* Push up from footer */
+            right: 5%;     /* Push in from right */
+            flex-direction: row-reverse; /* Flip layout: Text Left, Image Right */
+        }
+        
+        #project-2 .project-info {
+            text-align: right; /* Right align the text block */
+        }
+
+        /* --- FOOTER (Fixed) --- */
+        .footer-nav {
+            position: absolute;
+            bottom: 40px; left: 0; width: 100%;
+            padding: 0 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            z-index: 10;
+        }
+
+        .footer-link {
+            font-weight: 700;
+            font-size: 1.2rem;
+            text-transform: lowercase;
+        }
+        
+        .footer-center {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* --- MOBILE RESPONSIVENESS --- */
+        /* Since 100vh is too small for stacked phones, we switch back to scroll */
+        @media (max-width: 768px) {
+            body { height: auto; overflow-y: auto; overflow-x: hidden; }
+            
+            header { position: relative; padding: 30px 20px; margin-bottom: 40px; }
+            .logo-img { width: 100px; }
+            .page-title { font-size: 1rem; }
+
+            main { display: flex; flex-direction: column; gap: 80px; padding-bottom: 100px; }
+
+            .project-card {
+                position: relative; /* Stop absolute positioning */
+                top: auto !important; bottom: auto !important; 
+                left: auto !important; right: auto !important;
+                width: 100%; max-width: 100%;
+                flex-direction: column !important; /* Stack vertical */
+                padding: 0 20px;
+            }
+
+            .project-img-box { width: 100%; aspect-ratio: 4/3; }
+            .project-info { width: 100%; text-align: left !important; }
+
+            .footer-nav {
+                position: relative;
+                margin-top: 50px;
+                padding-bottom: 40px;
+                flex-direction: column;
+                gap: 20px;
+                align-items: center;
+                text-align: center;
+            }
+            .footer-center { position: relative; left: auto; transform: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-container">
+            <img src="Main Logo - Dark brown - without byline.svg" alt="forma" class="logo-img">
+        </div>
+        <div class="page-title">projects</div>
+    </header>
+
+    <main>
+
+        <a href="#" class="project-card" id="project-1">
+            <div class="project-img-box">
+                <img src="/demo.png" alt="Project 1" class="project-img">
+            </div>
+            <div class="project-info">
+                <div class="p-title">the aerie</div>
+                <div class="p-meta">
+                    Area: 0000 sqft <br>
+                    Budget: Rs. 00 cr <br>
+                    Location: Kotagiri, Tamil Nadu <br>
+                    Year: 2024
+                </div>
+            </div>
+        </a>
+
+        <a href="#" class="project-card" id="project-2">
+            <div class="project-img-box">
+                <img src="/demo.png" alt="Project 2" class="project-img">
+            </div>
+            <div class="project-info">
+                <div class="p-title">the aerie</div>
+                <div class="p-meta">
+                    Area: 0000 sqft <br>
+                    Budget: Rs. 00 cr <br>
+                    Location: Kotagiri, Tamil Nadu <br>
+                    Year: 2024
+                </div>
+            </div>
+        </a>
+
+    </main>
+
+    <nav class="footer-nav">
+        <a href="contact.html" class="footer-link">contact</a>
+        <a href="services.html" class="footer-link footer-center">services</a>
+        <a href="forma.html" class="footer-link">home</a>
+    </nav>
+
+</body>
+</html>
