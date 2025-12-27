@@ -294,7 +294,7 @@
         <!-- Project 1 (Left / Odd) -->
         <a href="#" class="project-card">
             <div class="project-img-box">
-                <img src="/home1.png" alt="Project 1" class="project-img" id="img-project-1">
+                <img src="/demo.png" alt="Project 1" class="project-img" id="img-project-1">
             </div>
             <div class="project-info">
                 <div class="p-title">the aerie</div>
@@ -313,7 +313,7 @@
         <!-- Project 2 (Right / Even) -->
         <a href="#" class="project-card">
             <div class="project-img-box">
-                <img src="/home2org.png" alt="Project 2" class="project-img" id="img-project-2">
+                <img src="/home1.png" alt="Project 2" class="project-img" id="img-project-2">
             </div>
             <div class="project-info">
                 <div class="p-title">the aerie</div>
@@ -425,14 +425,14 @@
             btnNext.addEventListener('click', (e) => {
                 e.preventDefault();
                 // Pass the image to animate AND the destination URL
-                startTransition(rightImage, 'project3.html?transition=next');
+                startTransition(rightImage, 'project2.html?transition=next');
             });
 
             // PREVIOUS (UNDU) BUTTON -> Goes to project3.html
             btnPrev.addEventListener('click', (e) => {
                 e.preventDefault();
                 // Pass the image to animate AND the destination URL
-                startTransition(leftImage, 'project1.html?transition=prev');
+                startTransition(leftImage, 'project3.html?transition=prev');
             });
 
 

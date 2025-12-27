@@ -24,10 +24,10 @@
             font-family: var(--font-main);
             background-color: var(--color-bg);
             color: var(--color-text);
-            min-height: 100vh;
+            /* CHANGED: Fixed height, no scroll */
+            height: 100vh;
             width: 100%;
-            overflow-x: hidden; 
-            overflow-y: auto;
+            overflow: hidden; 
             position: relative;
         }
 
@@ -40,7 +40,7 @@
         header {
             position: fixed; 
             top: 0; left: 0; width: 100%;
-            padding: 40px 50px;
+            padding: 30px 50px; /* Reduced padding slightly */
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
@@ -49,33 +49,37 @@
         }
         header > * { pointer-events: auto; }
 
-        .logo-img { width: 140px; height: auto; mix-blend-mode: multiply; }
-        .page-title { font-weight: 700; font-size: 1.1rem; text-transform: lowercase; margin-top: 10px; }
+        .logo-img { width: 120px; height: auto; mix-blend-mode: multiply; } /* Smaller logo */
+        .page-title { font-weight: 700; font-size: 1rem; text-transform: lowercase; margin-top: 10px; }
 
         /* --- MAIN LAYOUT --- */
         main {
             width: 100%;
-            padding-top: 180px;
-            padding-bottom: 150px;
+            height: 100vh;
+            /* Adjust padding to center content between header/footer */
+            padding-top: 100px;
+            padding-bottom: 80px;
             display: flex;
             flex-direction: column;
-            gap: 20vh; 
+            justify-content: center; /* Center vertically */
+            gap: 5vh; /* Much smaller gap */
         }
 
         /* Common Project Styles */
         .project-card {
             position: relative; 
             display: flex;
-            align-items: flex-start;
-            gap: 30px;
-            width: 60vw;
-            max-width: 900px;
+            align-items: center; /* Center items vertically */
+            gap: 20px;
+            /* Reduced width to fit two in viewport */
+            width: 42vw; 
+            max-width: 600px;
             /* opacity transition handled by JS during page transition */
         }
 
         .project-img-box {
-            width: 60%;
-            aspect-ratio: 16/11;
+            width: 55%;
+            aspect-ratio: 16/10;
             overflow: hidden;
             position: relative; /* Context for image */
         }
@@ -90,31 +94,36 @@
         .project-card:hover .project-img { transform: scale(1.03); }
 
         .project-info {
-            width: 40%;
-            padding-top: 5px;
+            width: 45%;
+            padding-top: 0;
             display: flex;
             flex-direction: column;
         }
 
         .p-title {
             font-weight: 800;
-            font-size: 1.4rem;
-            margin-bottom: 12px;
+            font-size: 1.2rem; /* Slightly smaller font */
+            margin-bottom: 8px;
             text-transform: lowercase;
         }
 
         .p-meta {
-            font-size: 0.85rem;
-            line-height: 1.5;
+            font-size: 0.75rem; /* Slightly smaller font */
+            line-height: 1.4;
             color: #333;
             font-weight: 500;
         }
 
         .p-desc {
-            margin-top: 20px;
+            margin-top: 12px;
             opacity: 0;
-            transform: translateY(30px);
+            transform: translateY(20px);
             transition: opacity 0.8s ease, transform 0.8s ease;
+            /* Ensure text doesn't overflow if it's too long */
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;  
+            overflow: hidden;
         }
 
         .p-desc.reveal {
@@ -141,7 +150,7 @@
         /* --- PAGINATION NAV BUTTONS --- */
         .pagination-nav {
             position: fixed;
-            bottom: 90px; 
+            bottom: 85px; 
             left: 0;
             width: 100%;
             padding: 0 50px;
@@ -155,7 +164,7 @@
         .pagination-btn {
             pointer-events: auto;
             font-weight: 700;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             text-transform: lowercase;
             color: var(--color-text);
             cursor: pointer;
@@ -164,7 +173,6 @@
             overflow: hidden;
         }
         
-        /* Button hover underline effect */
         .pagination-btn::after {
             content: '';
             position: absolute;
@@ -183,7 +191,7 @@
         /* --- FOOTER (Fixed) --- */
         .footer-nav {
             position: fixed; 
-            bottom: 40px; left: 0; width: 100%;
+            bottom: 30px; left: 0; width: 100%;
             padding: 0 50px;
             display: flex;
             justify-content: space-between;
@@ -195,7 +203,7 @@
 
         .footer-link {
             font-weight: 700;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             text-transform: lowercase;
         }
         
@@ -226,14 +234,17 @@
 
         /* --- MOBILE RESPONSIVENESS --- */
         @media (max-width: 768px) {
+            body { height: auto; overflow-y: auto; } /* Allow scroll on mobile */
             header { position: relative; padding: 30px 20px; margin-bottom: 20px; }
             .logo-img { width: 100px; }
             .page-title { font-size: 1rem; }
 
             main { 
-                padding-top: 20px; 
+                padding-top: 0; 
                 padding-bottom: 60px;
-                gap: 80px; 
+                gap: 60px; 
+                height: auto;
+                justify-content: flex-start;
             }
 
             .project-card {
@@ -273,7 +284,7 @@
 
     <header>
         <div class="logo-container">
-            <img src="/Forma/Main Logo - Dark brown - without byline.svg" alt="forma" class="logo-img">
+            <img src="/Main Logo - Dark brown - without byline.svg" alt="forma" class="logo-img">
         </div>
         <div class="page-title">projects</div>
     </header>
@@ -283,7 +294,7 @@
         <!-- Project 1 (Left / Odd) -->
         <a href="#" class="project-card">
             <div class="project-img-box">
-                <img src="/Forma/home1.png" alt="Project 1" class="project-img" id="img-project-1">
+                <img src="/home2org.png" alt="Project 1" class="project-img" id="img-project-1">
             </div>
             <div class="project-info">
                 <div class="p-title">the aerie</div>
@@ -302,7 +313,7 @@
         <!-- Project 2 (Right / Even) -->
         <a href="#" class="project-card">
             <div class="project-img-box">
-                <img src="/Forma/home2org.png" alt="Project 2" class="project-img" id="img-project-2">
+                <img src="/home3.png" alt="Project 2" class="project-img" id="img-project-2">
             </div>
             <div class="project-info">
                 <div class="p-title">the aerie</div>
@@ -317,6 +328,19 @@
                 </div>
             </div>
         </a>
+        
+        <!-- Project 3 - Commented out to ensure only 2 are shown as per "no scroll" request -->
+        <!-- 
+        <a href="#" class="project-card">
+            <div class="project-img-box">
+                <img src="/Forma/demo.png" alt="Project 3" class="project-img" id="img-project-3">
+            </div>
+            <div class="project-info">
+               ...
+            </div>
+        </a> 
+        -->
+
     </main>
 
     <!-- Pagination Buttons -->
@@ -336,19 +360,17 @@
     <!-- Hidden layer for transition animation -->
     <div class="transition-layer" id="transition-layer"></div>
 
-    <script>
+  <script>
         document.addEventListener('DOMContentLoaded', () => {
             
-            // --- 1. SCROLL REVEAL LOGIC ---
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('reveal');
-                    }
+            // --- 1. AUTO REVEAL LOGIC ---
+            setTimeout(() => {
+                document.querySelectorAll('.p-desc').forEach((desc, index) => {
+                    setTimeout(() => {
+                        desc.classList.add('reveal');
+                    }, index * 200); 
                 });
-            }, { threshold: 0.3 });
-
-            document.querySelectorAll('.p-desc').forEach(desc => observer.observe(desc));
+            }, 500);
 
 
             // --- 2. TRANSITION ANIMATION LOGIC ---
@@ -356,12 +378,12 @@
             const btnPrev = document.getElementById('btn-prev');
             const btnNext = document.getElementById('btn-next');
 
-            // Select generic images for demo (in real app, use logic to find specific ID)
-            // Odd = Left, Even = Right in CSS
+            // Select generic images for demo 
             const leftImage = document.querySelector('.project-card:nth-child(1) .project-img');
             const rightImage = document.querySelector('.project-card:nth-child(2) .project-img');
 
-            function startTransition(sourceImg, direction) {
+            // MODIFIED: Function now accepts the specific Destination URL
+            function startTransition(sourceImg, destinationUrl) {
                 if (!sourceImg) return;
 
                 // 1. Get position of source image
@@ -378,11 +400,11 @@
                 clone.style.top = `${rect.top}px`;
                 clone.style.left = `${rect.left}px`;
                 
-                transitionLayer.innerHTML = ''; // Clear old
+                transitionLayer.innerHTML = ''; 
                 transitionLayer.appendChild(clone);
                 transitionLayer.style.display = 'block';
 
-                // 4. Force reflow so browser accepts starting position
+                // 4. Force reflow
                 void clone.offsetWidth; 
 
                 // 5. Animate to Full Screen
@@ -391,44 +413,37 @@
                 clone.style.width = '100vw';
                 clone.style.height = '100vh';
 
-                // 6. Navigate after animation completes
+                // 6. Navigate after animation completes using the passed URL
                 setTimeout(() => {
-                    // Simulate navigation to next page
-                    // We add a query param so we can detect "entrance" on reload
-                    const newUrl = window.location.pathname + `?transition=${direction}`;
-                    window.location.href = newUrl;
-                }, 1200); // Matches CSS transition time
+                    window.location.href = destinationUrl;
+                }, 1200); 
             }
 
-            // Click Handlers
+            // --- CLICK HANDLERS (UPDATED URLs) ---
+            
+            // NEXT BUTTON -> Goes to project2.html
             btnNext.addEventListener('click', (e) => {
                 e.preventDefault();
-                // "Next" (Right) -> Animate right image
-                startTransition(rightImage, 'next');
+                // Pass the image to animate AND the destination URL
+                startTransition(rightImage, 'project1.html?transition=next');
             });
 
+            // PREVIOUS (UNDU) BUTTON -> Goes to project3.html
             btnPrev.addEventListener('click', (e) => {
                 e.preventDefault();
-                // "Prev" (Left) -> Animate left image
-                startTransition(leftImage, 'prev');
+                // Pass the image to animate AND the destination URL
+                startTransition(leftImage, 'project2.html?transition=prev');
             });
 
 
             // --- 3. ENTRANCE ANIMATION (ZOOM OUT) ---
-            // Check if we just arrived from a transition
             const urlParams = new URLSearchParams(window.location.search);
             const transitionType = urlParams.get('transition');
 
             if (transitionType) {
-                // If we have a param, it means we are "entering" the new page
-                // We need to simulate the "Zoom Out" from the hero image
-                
-                // Pick a target to zoom OUT to (usually the first image on the new page)
-                // For demo, we use the first image
                 const targetImg = document.querySelector('.project-card:nth-child(1) .project-img');
                 
                 if (targetImg) {
-                    // 1. Prepare Overlay
                     const rect = targetImg.getBoundingClientRect();
                     const clone = document.createElement('img');
                     clone.src = targetImg.src;
@@ -444,11 +459,9 @@
                     transitionLayer.appendChild(clone);
                     transitionLayer.style.display = 'block';
                     
-                    // Hide the real image temporarily so it doesn't double up
                     targetImg.style.opacity = '0';
 
-                    // 2. Animate DOWN to target position
-                    // We need a slight delay to ensure the browser has rendered the full screen first
+                    // Animate DOWN to target position
                     setTimeout(() => {
                         clone.style.width = `${rect.width}px`;
                         clone.style.height = `${rect.height}px`;
@@ -456,11 +469,10 @@
                         clone.style.left = `${rect.left}px`;
                     }, 50);
 
-                    // 3. Cleanup after animation
+                    // Cleanup
                     setTimeout(() => {
                         targetImg.style.opacity = '1';
                         transitionLayer.style.display = 'none';
-                        // Clean URL
                         window.history.replaceState({}, document.title, window.location.pathname);
                     }, 1250);
                 }
