@@ -28,13 +28,62 @@
             box-sizing: border-box;
         }
 
+        html {
+            /* Enable Scroll Snap on the main document */
+            height: 100vh;
+            overflow-y: scroll;
+            overflow-x: hidden;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+        }
+
         body {
             font-family: var(--font-main);
             color: var(--color-secondary);
             background-color: #a0a0a0;
-            overflow-x: hidden;
-            overflow-y: scroll;
+            min-height: 100vh;
+            width: 100%;
         }
+
+        /* --- ANIMATION UTILITIES --- */
+        
+        /* 1. Word Split Animation Styles */
+        .reveal-text-wrapper {
+            overflow: hidden;
+            display: inline-block;
+            vertical-align: bottom;
+            margin-right: 0.25em; /* Space between words */
+            line-height: 1.2;
+        }
+
+        .reveal-text-inner {
+            display: inline-block;
+            transform: translateY(120%); /* Start hidden below */
+            opacity: 0;
+            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease;
+            will-change: transform, opacity;
+        }
+
+        /* 2. General Fade Up Animation */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 1s ease-out, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: transform, opacity;
+        }
+
+        /* Active States (Triggered by JS) */
+        .is-in-view .reveal-text-inner {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .is-in-view.animate-on-scroll, 
+        .is-in-view .animate-on-scroll {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
 
         /* --- LAYOUT LAYERS --- */
 
@@ -58,6 +107,10 @@
         .scroll-target {
             height: 100vh;
             width: 100%;
+            /* Snap Alignment */
+            scroll-snap-align: start;
+            /* Changed to normal to allow smoother scrolling past sections */
+            scroll-snap-stop: normal; 
         }
 
         /* 3. Fixed UI Overlay (Hero) */
@@ -118,7 +171,7 @@
 
         /* --- HERO LOGO --- */
         .logo-img {
-            width: clamp(200px, 40vw, 600px);
+            width: clamp(200px, 40vw, 430px);
             height: auto;
             opacity: 0.9;
             mix-blend-mode: overlay;
@@ -217,6 +270,9 @@
             padding: 60px 40px 100px 40px;
             display: flex;
             flex-direction: column;
+            /* Snap Alignment */
+            scroll-snap-align: start;
+            scroll-snap-stop: normal; /* Relaxed snap */
         }
 
         .project-meta-row {
@@ -258,7 +314,7 @@
             background-position: center;
             background-repeat: no-repeat;
             color: #1a1a1a;
-            overflow: hidden;
+            /* Removed overflow: hidden to prevent scroll blocking */
         }
 
         /* --- STICKY LOGO IN ABOUT SECTION --- */
@@ -297,6 +353,9 @@
             display: flex;
             position: relative;
             z-index: 32;
+            /* Snap Alignment for each subsection */
+            scroll-snap-align: start;
+            scroll-snap-stop: normal; /* Relaxed snap */
         }
 
         .about-h2 {
@@ -365,18 +424,6 @@
 
         }
 
-        /* --- Mobile Reset (Add to your existing @media query) --- */
-        @media (max-width: 768px) {
-
-            .design-align,
-            .build-align {
-                align-self: flex-start;
-                text-align: left;
-                margin-right: 0;
-                margin-left: 0;
-            }
-        }
-
         .intro-block {
             margin-right: 5%;
         }
@@ -439,14 +486,14 @@
 
         /* Left Column: Text First, then Image */
         .team-left {
-            margin-top: 0;
+            margin-top: 10rem;
             /* Starts at top */
         }
 
         /* Right Column: Image First, then Text */
         .team-right {
             /* Push down slightly for staggered look if needed, or keep aligned top */
-            margin-top: 50px;
+            margin-top: 15rem;
         }
 
         /* SECTION 4: Contact */
@@ -490,31 +537,63 @@
            ========================================= */
         @media (max-width: 768px) {
 
-            /* General Padding */
+            /* 1. HERO SECTION ALIGNMENT */
             #fixed-ui {
-                grid-template-columns: 1fr;
-                grid-template-rows: auto 1fr;
+                /* Change grid to flex column to stack logo and text centrally */
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
                 padding: 40px 20px;
+                gap: 20px; /* Space between logo and text */
+                text-align: center;
             }
 
+            .screen-left {
+                width: 100%;
+                justify-content: center; /* Center logo */
+                align-items: flex-end;
+                margin-bottom: 0;
+            }
+
+            .screen-right {
+                width: 100%;
+                justify-content: center; /* Center text container */
+                align-items: center;
+            }
+
+            .logo-img {
+                width: 50vw;
+            }
+
+            .hero-wrapper-center {
+                height: auto;
+            }
+
+            .hero-content {
+                /* Force row to keep "design + build" together */
+                flex-direction: row; 
+                align-items: center;
+                justify-content: center;
+                gap: 15px;
+                padding-right: 0;
+            }
+
+            /* Dropdown alignment */
+            .dropdown-menu {
+                left: 50%;
+                transform: translateX(-50%);
+                align-items: center;
+            }
+
+
+            /* 2. GENERAL PADDING & LAYOUT */
             #lower-half {
                 padding: 40px 20px;
             }
 
             .about-sub-section {
-                padding: 100px 20px 40px 20px;
-            }
-
-            /* Hero Adjustments */
-            .logo-img {
-                width: 60vw;
-            }
-
-            .hero-content {
-                flex-direction: column;
-                align-items: flex-end;
-                gap: 10px;
-                justify-content: flex-start;
+                padding: 60px 20px; /* Reduced vertical padding */
             }
 
             .nav-services {
@@ -527,13 +606,6 @@
                 left: 20px;
             }
 
-            .dropdown-menu {
-                position: relative;
-                align-items: flex-end;
-                margin-top: 5px;
-            }
-
-            /* Project Adjustments */
             .large-project-image {
                 height: 50vh;
             }
@@ -545,16 +617,14 @@
                 text-align: right;
             }
 
-            /* --- ABOUT SECTION MOBILE --- */
-
-            /* Sticky Logo moves to top-left on mobile */
             .about-sticky-logo {
                 width: 30vw;
                 top: 2%;
                 left: 20px;
             }
 
-            /* Intro */
+
+            /* 3. INTRO SECTION */
             #about-intro {
                 gap: 60px;
                 justify-content: flex-start;
@@ -566,11 +636,24 @@
                 margin-right: 0;
                 align-self: flex-start;
             }
+            .design-align,
+            .build-align {
+                align-self: flex-start;
+                text-align: left;
+                margin-right: 0;
+                margin-left: 0;
+            }
 
-            /* Services */
+
+            /* 4. SERVICES SECTION COMPACTION */
+            #about-services {
+                 justify-content: center;
+                 gap: 30px; /* Reduced gap so they fit in viewport */
+            }
+
             .services-row {
                 flex-direction: column;
-                gap: 60px;
+                gap: 40px; /* Reduced gap */
             }
 
             .serv-left {
@@ -581,14 +664,16 @@
             .serv-right {
                 margin-right: 0;
                 align-self: flex-start;
-                text-align: left;
+                text-align: left; /* Align text left */
                 margin-bottom: 0;
+                margin-top: 0; /* Reset margins */
             }
 
-            /* Team - Stack vertically */
+
+            /* 5. TEAM SECTION - ORDERING */
             #about-team {
                 flex-direction: column;
-                gap: 80px;
+                gap: 60px;
                 margin-top: 40px;
             }
 
@@ -596,15 +681,27 @@
                 width: 100%;
             }
 
+            /* Team Left is already Text -> Image in HTML */
+
+            /* Team Right is Image -> Text in HTML. Flip it for Mobile */
             .team-right {
+                display: flex;
+                flex-direction: column-reverse; /* Text first, then Image */
                 margin-top: 0;
             }
 
-            .team-img1 {
+            .team-img1, .team-img2 {
                 height: 400px;
+                width: 100%;
+                max-width: 300px; /* Prevent too wide on mobile */
+            }
+            
+            .team-img2 {
+                 margin-top: 20px; /* Space between text and image */
             }
 
-            /* Contact */
+
+            /* 6. CONTACT SECTION */
             .contact-container {
                 flex-direction: column;
                 gap: 40px;
@@ -622,46 +719,6 @@
                 display: none;
             }
         }
-        /* --- FIXED FOOTER (Replaces Fixed Nav) --- */
-.fixed-footer {
-    position: fixed;
-    bottom: 40px;
-    left: 0;
-    width: 100%;
-    padding: 0 40px;
-    display: flex;
-    justify-content: space-between; /* Pushes Contact left, Home right */
-    align-items: flex-end;
-    z-index: 30;
-    pointer-events: none;
-    mix-blend-mode: difference; /* Ensures visibility on all backgrounds */
-    color: #fff;
-    transition: opacity 0.5s ease;
-}
-
-.footer-link {
-    font-weight: 700;
-    font-size: 1rem;
-    text-decoration: none;
-    color: inherit;
-    pointer-events: auto;
-    text-transform: lowercase;
-}
-
-/* Centers the 'services' link exactly */
-.footer-center {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-/* Mobile Adjustment */
-@media (max-width: 768px) {
-    .fixed-footer {
-        bottom: 20px;
-        padding: 0 20px;
-    }
-}
     </style>
 </head>
 
@@ -674,7 +731,7 @@
 
     <div id="fixed-ui">
         <div class="screen-left">
-            <img src="Logo - Cream - without byline_1@400x.png" alt="forma" class="logo-img">
+            <img src="/Logo - Cream - without byline_1@400x.png" alt="forma" class="logo-img">
         </div>
         <div class="screen-right">
             <div class="hero-wrapper-center">
@@ -694,102 +751,109 @@
     </div>
 
     <div id="scroll-container">
+        <!-- These empty sections are for the Three.js bg scroll and now snap -->
         <section class="scroll-target"></section>
         <section class="scroll-target"></section>
         <section class="scroll-target"></section>
         <section class="scroll-target"></section>
 
+        <!-- Lower Half Section with Animation Classes Added -->
         <section id="lower-half">
-            <div class="project-meta-row">
+            <div class="project-meta-row animate-on-scroll">
                 <span>2024, Holiday home, Kotagiri, Tamil Nadu</span>
                 <span class="project-title-bold">the aerie</span>
             </div>
-            <img src="/demo.png" alt="The Aerie" class="large-project-image">
+            <img src="/demo.png" alt="The Aerie" class="large-project-image animate-on-scroll">
         </section>
 
         <section id="about-sequence">
 
             <div class="about-sticky-logo" id="about-logo">
-                <img src="Logo - Cream - without byline_1@400x.png" alt="forma logo">
+                <img src="/Logo - Cream - without byline_1@400x.png" alt="forma logo">
             </div>
 
+            <!-- Intro Section with Split Text Classes Added -->
             <div class="about-sub-section" id="about-intro">
 
                 <div class="intro-block design-align">
-                    <h2 class="about-h2w">design</h2>
-                    <p class="about-p2">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+                    <h2 class="about-h2w split-animate">design</h2>
+                    <p class="about-p2 split-animate">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
                         incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniamincididunt ut labore et
                         dolore magna aliqua. Ut enim ad minim veniam.</p>
                 </div>
 
                 <div class="intro-block build-align">
-                    <h2 class="about-h2">build</h2>
-                    <p class="about-p">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+                    <h2 class="about-h2 split-animate">build</h2>
+                    <p class="about-p split-animate">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
                         incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
                         exercitationincididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
                         exercitation.
                     </p>
                 </div>
             </div>
+
+            <!-- Services Section with Split Text Classes Added -->
             <div class="about-sub-section" id="about-services">
                 <div class="plus-marker" style="top:70%">+</div>
                 <div class="services-row">
                     <div class="serv-left">
-                        <h2 class="about-h2w">our services</h2>
-                        <p class="about-p2">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+                        <h2 class="about-h2w split-animate">our services</h2>
+                        <p class="about-p2 split-animate">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
                             tempor incididunt ut labore et dolore magna aliqua.</p>
                     </div>
                     <div class="serv-right">
-                        <h2 class="about-h2">our services</h2>
-                        <p class="about-p">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+                        <h2 class="about-h2 split-animate">our services</h2>
+                        <p class="about-p split-animate">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
                             tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.</p>
                     </div>
                 </div>
             </div>
 
+            <!-- Team Section with Animations Added -->
             <div class="about-sub-section" id="about-team">
 
                 <div class="team-col team-left">
                     <div>
-                        <h2 class="about-h2w">ram pai</h2>
-                        <p class="about-p2">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+                        <h2 class="about-h2w split-animate">ram pai</h2>
+                        <p class="about-p2 split-animate">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
                             tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.</p>
                     </div>
-                    <img src="demo.png" class="team-img1" alt="Ram Pai">
+                    <img src="demo.png" class="team-img1 animate-on-scroll" alt="Ram Pai">
                 </div>
 
                 <div class="team-col team-right">
-                    <img src="demo.png" class="team-img2" alt="Suraksha">
+                    <img src="demo.png" class="team-img2 animate-on-scroll" alt="Suraksha">
                     <div>
-                        <h2 class="about-h2">suraksha</h2>
-                        <p class="about-p">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+                        <h2 class="about-h2 split-animate">suraksha</h2>
+                        <p class="about-p split-animate">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
                             tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.</p>
                     </div>
                 </div>
             </div>
 
+            <!-- Contact Section with Animations Added -->
             <div class="about-sub-section" id="about-contact">
                 <div class="contact-container">
                     <div class="contact-left">
                         <div class="contact-group">
-                            <h2 class="about-h2w">contact</h2>
+                            <h2 class="about-h2w split-animate">contact</h2>
                             <a href="mailto:hello@formadesignbuild.com"
-                                class="contact-link2">hello@formadesignbuild.com</a>
+                                class="contact-link2 animate-on-scroll">hello@formadesignbuild.com</a>
                         </div>
                         <div class="contact-group">
-                            <h2 class="about-h2w">instagram</h2>
-                            <a href="#" class="contact-link2">@formadesignbuild</a>
+                            <h2 class="about-h2w split-animate">instagram</h2>
+                            <a href="#" class="contact-link2 animate-on-scroll">@formadesignbuild</a>
                         </div>
                     </div>
                     <div class="contact-right">
                         <div class="plus-marker" style="position: relative; right: 0; margin-bottom: 20px;">+</div>
                         <div class="contact-group">
-                            <h2 class="about-h2">address</h2>
-                            <p class="about-p">forma design + build<br>cooke town<br>bangalore 560 084</p>
+                            <h2 class="about-h2 split-animate">address</h2>
+                            <p class="about-p split-animate">forma design + build  bangalore 560 084</p>
                         </div>
                         <div class="contact-group">
-                            <h2 class="about-h2">phone</h2>
-                            <p class="about-p">+91 00000 00000</p>
+                            <h2 class="about-h2 split-animate">phone</h2>
+                            <p class="about-p split-animate">+91 00000 00000</p>
                         </div>
                     </div>
                 </div>
@@ -799,6 +863,49 @@
     </div>
 
     <script>
+        // --- ANIMATION INIT ---
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // 1. Text Splitter Utility
+            // Finds all elements with class 'split-animate' and wraps words in spans
+            const splitElements = document.querySelectorAll('.split-animate');
+            splitElements.forEach(el => {
+                const text = el.innerText;
+                const words = text.split(' ');
+                el.innerHTML = '';
+                
+                words.forEach((word, index) => {
+                    const wrapper = document.createElement('span');
+                    wrapper.className = 'reveal-text-wrapper';
+                    
+                    const inner = document.createElement('span');
+                    inner.className = 'reveal-text-inner';
+                    inner.innerText = word + '\u00A0'; // Add non-breaking space
+                    // Stagger delay based on index
+                    inner.style.transitionDelay = `${index * 0.03}s`;
+                    
+                    wrapper.appendChild(inner);
+                    el.appendChild(wrapper);
+                });
+            });
+
+            // 2. Intersection Observer for Scrolling Animations
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-in-view');
+                        // Optional: Unobserve after animating once
+                        // observer.unobserve(entry.target); 
+                    }
+                });
+            }, { threshold: 0.2 }); // Trigger when 20% visible
+
+            // Observe all animation targets and sections
+            const targets = document.querySelectorAll('.about-sub-section, #lower-half, .animate-on-scroll, .split-animate');
+            targets.forEach(target => observer.observe(target));
+        });
+
+
         // --- UI INTERACTION ---
         function toggleMenu() {
             document.getElementById('dropdown-menu').classList.toggle('active');

@@ -294,7 +294,7 @@
         <!-- Project 1 (Left / Odd) -->
         <a href="#" class="project-card">
             <div class="project-img-box">
-                <img src="/demo.png" alt="Project 1" class="project-img" id="img-project-1">
+                <img src="/home1.png" alt="Project 1" class="project-img" id="img-project-1">
             </div>
             <div class="project-info">
                 <div class="p-title">the aerie</div>
@@ -313,7 +313,7 @@
         <!-- Project 2 (Right / Even) -->
         <a href="#" class="project-card">
             <div class="project-img-box">
-                <img src="/demo.png" alt="Project 2" class="project-img" id="img-project-2">
+                <img src="/home2org.png" alt="Project 2" class="project-img" id="img-project-2">
             </div>
             <div class="project-info">
                 <div class="p-title">the aerie</div>
@@ -360,16 +360,15 @@
     <!-- Hidden layer for transition animation -->
     <div class="transition-layer" id="transition-layer"></div>
 
-    <script>
+  <script>
         document.addEventListener('DOMContentLoaded', () => {
             
-            // --- 1. AUTO REVEAL LOGIC (Replaced Scroll Trigger) ---
-            // Triggers shortly after load since everything is in viewport
+            // --- 1. AUTO REVEAL LOGIC ---
             setTimeout(() => {
                 document.querySelectorAll('.p-desc').forEach((desc, index) => {
                     setTimeout(() => {
                         desc.classList.add('reveal');
-                    }, index * 200); // Stagger the reveal slightly
+                    }, index * 200); 
                 });
             }, 500);
 
@@ -379,12 +378,12 @@
             const btnPrev = document.getElementById('btn-prev');
             const btnNext = document.getElementById('btn-next');
 
-            // Select generic images for demo (in real app, use logic to find specific ID)
-            // Odd = Left, Even = Right in CSS
+            // Select generic images for demo 
             const leftImage = document.querySelector('.project-card:nth-child(1) .project-img');
             const rightImage = document.querySelector('.project-card:nth-child(2) .project-img');
 
-            function startTransition(sourceImg, direction) {
+            // MODIFIED: Function now accepts the specific Destination URL
+            function startTransition(sourceImg, destinationUrl) {
                 if (!sourceImg) return;
 
                 // 1. Get position of source image
@@ -401,11 +400,11 @@
                 clone.style.top = `${rect.top}px`;
                 clone.style.left = `${rect.left}px`;
                 
-                transitionLayer.innerHTML = ''; // Clear old
+                transitionLayer.innerHTML = ''; 
                 transitionLayer.appendChild(clone);
                 transitionLayer.style.display = 'block';
 
-                // 4. Force reflow so browser accepts starting position
+                // 4. Force reflow
                 void clone.offsetWidth; 
 
                 // 5. Animate to Full Screen
@@ -414,43 +413,37 @@
                 clone.style.width = '100vw';
                 clone.style.height = '100vh';
 
-                // 6. Navigate after animation completes
+                // 6. Navigate after animation completes using the passed URL
                 setTimeout(() => {
-                    // Navigate to projects1.html with transition param
-                    const newUrl = `project1.html?transition=${direction}`;
-                    window.location.href = newUrl;
-                }, 1200); // Matches CSS transition time
+                    window.location.href = destinationUrl;
+                }, 1200); 
             }
 
-            // Click Handlers
+            // --- CLICK HANDLERS (UPDATED URLs) ---
+            
+            // NEXT BUTTON -> Goes to project2.html
             btnNext.addEventListener('click', (e) => {
                 e.preventDefault();
-                // "Next" (Right) -> Animate right image
-                startTransition(rightImage, 'next');
+                // Pass the image to animate AND the destination URL
+                startTransition(rightImage, 'project3.html?transition=next');
             });
 
+            // PREVIOUS (UNDU) BUTTON -> Goes to project3.html
             btnPrev.addEventListener('click', (e) => {
                 e.preventDefault();
-                // "Prev" (Left) -> Animate left image
-                startTransition(leftImage, 'prev');
+                // Pass the image to animate AND the destination URL
+                startTransition(leftImage, 'project1.html?transition=prev');
             });
 
 
             // --- 3. ENTRANCE ANIMATION (ZOOM OUT) ---
-            // Check if we just arrived from a transition
             const urlParams = new URLSearchParams(window.location.search);
             const transitionType = urlParams.get('transition');
 
             if (transitionType) {
-                // If we have a param, it means we are "entering" the new page
-                // We need to simulate the "Zoom Out" from the hero image
-                
-                // Pick a target to zoom OUT to (usually the first image on the new page)
-                // For demo, we use the first image
                 const targetImg = document.querySelector('.project-card:nth-child(1) .project-img');
                 
                 if (targetImg) {
-                    // 1. Prepare Overlay
                     const rect = targetImg.getBoundingClientRect();
                     const clone = document.createElement('img');
                     clone.src = targetImg.src;
@@ -466,11 +459,9 @@
                     transitionLayer.appendChild(clone);
                     transitionLayer.style.display = 'block';
                     
-                    // Hide the real image temporarily so it doesn't double up
                     targetImg.style.opacity = '0';
 
-                    // 2. Animate DOWN to target position
-                    // We need a slight delay to ensure the browser has rendered the full screen first
+                    // Animate DOWN to target position
                     setTimeout(() => {
                         clone.style.width = `${rect.width}px`;
                         clone.style.height = `${rect.height}px`;
@@ -478,17 +469,15 @@
                         clone.style.left = `${rect.left}px`;
                     }, 50);
 
-                    // 3. Cleanup after animation
+                    // Cleanup
                     setTimeout(() => {
                         targetImg.style.opacity = '1';
                         transitionLayer.style.display = 'none';
-                        // Clean URL
                         window.history.replaceState({}, document.title, window.location.pathname);
                     }, 1250);
                 }
             }
         });
     </script>
-    
 </body>
 </html>
